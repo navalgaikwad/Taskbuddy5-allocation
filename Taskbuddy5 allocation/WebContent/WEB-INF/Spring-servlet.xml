@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:security="http://www.springframework.org/schema/security"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.1.xsd
+		http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache-4.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.1.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
+		http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.1.xsd">
+
+<context:component-scan base-package="com.taskbuddy"/>
+	<mvc:annotation-driven/>
+<!-- resource mapping for css -->
+	<mvc:resources mapping="/css/**" location="/css/"/>
+	<mvc:resources mapping="/images/**" location="/images/"/>
+	<mvc:resources mapping="/js/**" location="/js/"/>
+	
+<!-- data-source configuration -->
+	<bean id="myDataSrc" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+		<property name="url" value="jdbc:mysql://localhost:3306/taskbuddy"/>
+		<property name="username" value="root"/>
+		<property name="password" value="manager"/>
+	</bean>
+	<!-- session factory configuration -->
+	<bean id="mySessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="myDataSrc"/>
+		<!-- <property name="configLocation" value="classpath:hibernate.cfg.xml"/>  -->
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+				<prop key="hibernate.show_sql">true</prop>
+			</props>
+		</property>
+		<property name="packagesToScan" value="com.taskbuddy.entities"/>
+	</bean>
+	
+<!--  exception handling 
+	<bean
+	  class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
+	  <property name="exceptionMappings">
+		<props>
+			<prop key="java.lang.Exception">error/exception_error</prop>
+		</props>
+	  </property>
+	</bean>
+	 -->
+	
+	
+<!-- transaction manager -->
+	<bean id="myTxManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="mySessionFactory" />
+	</bean>
+	<!-- set default transaction manager -->
+	<tx:annotation-driven transaction-manager="myTxManager"/>
+		
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+		<property name="prefix" value="/"/>
+		<property name="suffix" value=".jsp"/>	
+	</bean>
+
+
+</beans>
